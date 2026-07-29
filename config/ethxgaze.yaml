@@ -1,0 +1,35 @@
+# ETH-XGaze: subject-disjoint train/validation split and official test split.
+dataset: ETH-XGaze
+data:
+  root: /home/hqh/dataset/gaze/ETH-XGaze
+  image_dir: Image
+
+model:
+  name: dinov2_vits14
+  out_indices: [8, 9, 10, 11]
+  trans_dim: 128
+  fusion_layers: 6
+  fusion_heads: 8
+  fusion_ff: 512
+  fusion_dropout: 0.1
+
+train:
+  epochs: 100
+  batch_size: 256
+  lr: 1.0e-5
+  eta_min: 1.0e-7
+  weight_decay: 0.05
+  warmup_epochs: 3
+  num_workers: 6
+  save_top_k: 5
+
+logging:
+  visualize_samples: 16
+
+# Val selects checkpoints every epoch. The test label is touched only after the
+# best validation checkpoint has been selected.
+folds:
+  - name: split
+    train: [{label: train.label, prefix: train}]
+    val: [{label: val.label, prefix: train}]
+    test: [{label: test.label, prefix: test}]

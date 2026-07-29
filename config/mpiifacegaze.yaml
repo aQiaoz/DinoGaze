@@ -1,0 +1,36 @@
+# MPIIFaceGaze: standard 15-fold leave-one-subject-out evaluation.
+dataset: MPIIFaceGaze
+data:
+  root: /home/hqh/dataset/gaze/MPIIFaceGaze
+  image_dir: Image
+
+model:
+  name: dinov2_vits14
+  out_indices: [8, 9, 10, 11]
+  trans_dim: 128
+  fusion_layers: 6
+  fusion_heads: 8
+  fusion_ff: 512
+  fusion_dropout: 0.1
+
+train:
+  epochs: 50
+  batch_size: 256
+  lr: 5.0e-5
+  eta_min: 5.0e-7
+  weight_decay: 0.05
+  warmup_epochs: 3
+  num_workers: 6
+  save_top_k: 1
+
+logging:
+  visualize_samples: 16
+
+# The trainer expands this into p00 ... p14. The held-out subject is used as
+# the monitor because the official LOSO protocol supplies no separate val set.
+folds:
+  mode: leave_one_out
+  labels:
+    [p00.label, p01.label, p02.label, p03.label, p04.label,
+     p05.label, p06.label, p07.label, p08.label, p09.label,
+     p10.label, p11.label, p12.label, p13.label, p14.label]

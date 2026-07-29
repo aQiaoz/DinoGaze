@@ -1,0 +1,33 @@
+# Gaze360: official train/validation/test split.
+dataset: Gaze360
+data:
+  root: /home/hqh/dataset/gaze/Gaze360
+  image_dir: Image
+
+model:
+  name: dinov2_vits14
+  out_indices: [8, 9, 10, 11]
+  trans_dim: 128
+  fusion_layers: 6
+  fusion_heads: 8
+  fusion_ff: 512
+  fusion_dropout: 0.1
+
+train:
+  epochs: 100
+  batch_size: 256
+  lr: 5.0e-5
+  eta_min: 5.0e-7
+  weight_decay: 0.05
+  warmup_epochs: 3
+  num_workers: 6
+  save_top_k: 5
+
+logging:
+  visualize_samples: 16
+
+folds:
+  - name: split
+    train: [{label: train.label}]
+    val: [{label: val.label}]
+    test: [{label: test.label}]

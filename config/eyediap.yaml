@@ -1,0 +1,31 @@
+# EYEDIAP: GazeHub's four leave-one-cluster-out folds.
+dataset: EYEDIAP
+data:
+  root: /home/hqh/dataset/gaze/EyeDiap
+  image_dir: Image
+
+model:
+  name: dinov2_vits14
+  out_indices: [8, 9, 10, 11]
+  trans_dim: 128
+  fusion_layers: 6
+  fusion_heads: 8
+  fusion_ff: 512
+  fusion_dropout: 0.1
+
+train:
+  epochs: 50
+  batch_size: 128
+  lr: 5.0e-5
+  eta_min: 5.0e-7
+  weight_decay: 0.05
+  warmup_epochs: 3
+  num_workers: 6
+  save_top_k: 1
+
+logging:
+  visualize_samples: 16
+
+folds:
+  mode: leave_one_out
+  labels: [Cluster0.label, Cluster1.label, Cluster2.label, Cluster3.label]
