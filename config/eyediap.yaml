@@ -6,12 +6,8 @@ data:
 
 model:
   name: dinov2_vits14
-  out_indices: [8, 9, 10, 11]
-  trans_dim: 128
-  fusion_layers: 6
-  fusion_heads: 8
-  fusion_ff: 512
-  fusion_dropout: 0.1
+  head_hidden: 128
+  head_dropout: 0.1
 
 train:
   epochs: 50
