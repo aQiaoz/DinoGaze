@@ -7,9 +7,9 @@ last-four-layer feature fusion and auxiliary gaze losses are unchanged.
 The SAT comparison lives separately on `exp/cross-domain-topk-st`.
 
 ```bash
-python cross_domain.py train --source ethxgaze --exp dg_eth_uniform224
-python cross_domain.py train --source gaze360 --exp dg_gaze360_uniform224
-python cross_domain.py test --source ethxgaze --checkpoint /path/to/source.pt --output save/dg_eth_uniform224_eval.json
+python cross_domain.py train --source ethxgaze --exp dg_eth_224
+python cross_domain.py train --source gaze360 --exp dg_gaze360_224
+python cross_domain.py test --source ethxgaze --checkpoint /path/to/source.pt --output save/dg_eth_224_eval.json
 ```
 
 Each source is trained once; source validation MAE selects one checkpoint.
