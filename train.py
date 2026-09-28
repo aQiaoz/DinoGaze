@@ -62,6 +62,8 @@ def build_split_loader(data_config, entries, train_config, *, train, seed, limit
         num_workers=train_config.get("num_workers", 6),
         seed=seed,
         limit=limit,
+        image_size=data_config.get('image_size'),
+        resize=data_config.get('resize', False),
     )
 
 

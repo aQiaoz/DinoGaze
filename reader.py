@@ -15,6 +15,7 @@ import torch
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision import transforms
+from torchvision.transforms import InterpolationMode
 
 DINO_MEAN = (0.485, 0.456, 0.406)
 DINO_STD = (0.229, 0.224, 0.225)
@@ -40,7 +41,12 @@ class GazeDataset(Dataset):
     cross-dataset experiment needs -- no dataset-specific reader.
     """
 
-    def __init__(self, data_root, image_dir, entries):
+    def __init__(self, data_root, image_dir, entries, image_size=None, resize=False):
+        if image_size is not None and (int(image_size) != image_size or image_size < 1):
+            raise ValueError('image_size must be a positive integer.')
+        if resize and image_size is None:
+            raise ValueError('Resizing requires image_size.')
+        self.image_size, self.resize = image_size, resize
         self.records = []                       # (image_path: str, yaw, pitch)
         for entry in entries:
             entry = entry if isinstance(entry, dict) else {"label": entry}
@@ -58,7 +64,11 @@ class GazeDataset(Dataset):
 
         if not self.records:
             raise ValueError("No samples were read from the supplied label entries.")
-        self.transform = transforms.Compose([
+        steps = []
+        if resize:
+            steps.append(transforms.Resize((image_size, image_size),
+                         interpolation=InterpolationMode.BILINEAR, antialias=True))
+        self.transform = transforms.Compose(steps + [
             transforms.ToTensor(),
             transforms.Normalize(DINO_MEAN, DINO_STD),
         ])
@@ -69,14 +79,17 @@ class GazeDataset(Dataset):
     def __getitem__(self, index):
         path, yaw, pitch = self.records[index]
         with Image.open(path) as source:
+            if (self.image_size is not None and not self.resize
+                    and source.size != (self.image_size, self.image_size)):
+                raise ValueError(f'Unexpected image size {source.size}: {path}')
             image = self.transform(source.convert("RGB"))
         gaze = torch.tensor((yaw, pitch), dtype=torch.float32)
         return image, gaze, path
 
 
 def build_loader(data_root, image_dir, entries, batch_size, *, train=False,
-                 num_workers=6, seed=None, limit=0):
-    dataset = GazeDataset(data_root, image_dir, entries)
+                 num_workers=6, seed=None, limit=0, image_size=None, resize=False):
+    dataset = GazeDataset(data_root, image_dir, entries, image_size=image_size, resize=resize)
     if limit:
         dataset = Subset(dataset, range(min(limit, len(dataset))))
     generator = torch.Generator().manual_seed(seed) if seed is not None else None

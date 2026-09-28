@@ -1,5 +1,47 @@
 # DINOGaze2
 
+## Cross-Domain DG: Uniform224
+
+Branch `exp/cross-domain-uniform224` is based directly on main. The model,
+last-four-layer feature fusion and auxiliary gaze losses are unchanged.
+The SAT comparison lives separately on `exp/cross-domain-topk-st`.
+
+```bash
+python cross_domain.py train --source ethxgaze --exp dg_eth_uniform224
+python cross_domain.py train --source gaze360 --exp dg_gaze360_uniform224
+python cross_domain.py test --source ethxgaze --checkpoint /path/to/source.pt --output save/dg_eth_uniform224_eval.json
+```
+
+Each source is trained once; source validation MAE selects one checkpoint.
+That same checkpoint is evaluated on all 15 MPIIFaceGaze subjects and all four
+EYEDIAP clusters, without target training, BN adaptation, checkpoint selection
+or eye annotations. Source test is separately evaluated by the original trainer
+after source-val selection. It is not used to select weights.
+
+`config/cross_domain.yaml` declares source YAMLs, DG-only overrides, and target
+label groups. Both comparison branches use the same image roots/crops: Gaze360,
+MPII and EYEDIAP use gaze448; ETH uses the existing ETH crops. This branch
+bilinearly resizes inputs to 224. It is NOT reading a separately regenerated
+224 dataset, avoiding an additional crop difference. DG overrides source batch
+size to 200 to match Top-K-ST; other source training hyperparameters come from
+the main YAMLs. Match epochs, batch size and seed when comparing runs. Main's
+existing in-domain configs and no-resize reader default are unchanged.
+
+`--epochs`, `--batch-size`, `--workers`, `--seed`, `--limit` and `--save-root`
+are supported. `--limit` marks results smoke-only. Reusing a training experiment
+directory is rejected. Target results go to `cross_domain.json`, separate from
+`source_result.json`: `mae` is sample-weighted angular error; `macro_group_mae`
+is the unweighted mean over 15 subjects or 4 clusters. Report the same metric
+for both models. Per-group errors, source checkpoint and effective model are
+recorded. Test mode requires a source-val checkpoint with metadata.
+
+The supplied protocol uses existing GazeHub labels, not a claim of exact
+equivalence to every published DG table. Audit gaze normalization, frame
+subsampling, EYEDIAP session selection and Gaze360 angular filtering before
+cross-paper comparisons. No extra angular filtering is applied here.
+
+## Original Baseline
+
 Minimal, config-driven DINOv2 gaze-estimation baseline for four GazeHub-format
 datasets:
 
