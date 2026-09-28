@@ -2,7 +2,7 @@
 
 ## Cross-Domain DG: Uniform224
 
-Branch `exp/cross-domain-uniform224` is based directly on main. The model,
+Branch `exp/cross-domain-224` is based directly on main. The model,
 last-four-layer feature fusion and auxiliary gaze losses are unchanged.
 The SAT comparison lives separately on `exp/cross-domain-topk-st`.
 
@@ -18,14 +18,14 @@ EYEDIAP clusters, without target training, BN adaptation, checkpoint selection
 or eye annotations. Source test is separately evaluated by the original trainer
 after source-val selection. It is not used to select weights.
 
-`config/cross_domain.yaml` declares source YAMLs, DG-only overrides, and target
-label groups. Both comparison branches use the same image roots/crops: Gaze360,
-MPII and EYEDIAP use gaze448; ETH uses the existing ETH crops. This branch
-bilinearly resizes inputs to 224. It is NOT reading a separately regenerated
-224 dataset, avoiding an additional crop difference. DG overrides source batch
-size to 200 to match Top-K-ST; other source training hyperparameters come from
-the main YAMLs. Match epochs, batch size and seed when comparing runs. Main's
-existing in-domain configs and no-resize reader default are unchanged.
+`config/cross_domain.yaml` declares source YAMLs and target label groups.
+This branch reads native 224x224 images directly from `/home/hqh/dataset/gaze`
+for both source and target domains. No interpolation is performed; unexpected
+image sizes raise an error. Source batch size remains 256 as in the main YAMLs.
+Top-K-ST separately uses 448 input and batch size 200 due to GPU memory limits;
+that branch is unchanged. Report this batch-size difference, and audit crop
+alignment between the separately prepared 224/448 datasets when comparing.
+Main's existing in-domain configs and no-resize reader default are unchanged.
 
 `--epochs`, `--batch-size`, `--workers`, `--seed`, `--limit` and `--save-root`
 are supported. `--limit` marks results smoke-only. Reusing a training experiment

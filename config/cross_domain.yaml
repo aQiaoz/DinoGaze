@@ -1,21 +1,15 @@
-# Source-only DG. Both variants share source optimization and image crops.
+# Source-only DG on native 224 crops; source YAMLs retain batch_size=256.
 sources:
   ethxgaze: ethxgaze.yaml
   gaze360: gaze360.yaml
-source_overrides:
-  ethxgaze:
-    train: {batch_size: 200}
-  gaze360:
-    data: {root: /media/hqh/T9/gaze448/Gaze360}
-    train: {batch_size: 200}
 targets:
   mpiifacegaze:
-    root: /media/hqh/T9/gaze448/MPIIFaceGaze
+    root: /home/hqh/dataset/gaze/MPIIFaceGaze
     image_dir: Image
     groups: [p00.label, p01.label, p02.label, p03.label, p04.label,
              p05.label, p06.label, p07.label, p08.label, p09.label,
              p10.label, p11.label, p12.label, p13.label, p14.label]
   eyediap:
-    root: /media/hqh/T9/gaze448/EyeDiap
+    root: /home/hqh/dataset/gaze/EyeDiap
     image_dir: Image
     groups: [Cluster0.label, Cluster1.label, Cluster2.label, Cluster3.label]

@@ -18,7 +18,12 @@ class CrossDomainTest(unittest.TestCase):
             self.assertTrue(fold['val'])
             self.assertNotEqual(fold['train'], fold['val'])
             self.assertEqual(config['data']['image_size'], 224)
+            self.assertFalse(config['data']['resize'])
+            self.assertEqual(config['train']['batch_size'], 256)
+            self.assertTrue(config['data']['root'].startswith('/home/hqh/dataset/gaze/'))
             self.assertNotIn('scale', config['model'])
+        for target in protocol['targets'].values():
+            self.assertTrue(target['root'].startswith('/home/hqh/dataset/gaze/'))
 
     def test_sample_weighted_vs_group_mean(self):
         groups = [dict(samples=1, mae=1., yaw_mae=1., pitch_mae=1.),

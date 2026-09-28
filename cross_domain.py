@@ -26,7 +26,7 @@ def prepare_source(protocol, protocol_path, source, variant):
         raise ValueError('Source train and validation entries must differ.')
     if variant != 'uniform224' or config['model'].get('scale'):
         raise ValueError(f'Unknown variant: {variant}')
-    config['data'].update(image_size=224, resize=True)
+    config['data'].update(image_size=224, resize=False)
     config['dg'] = {'source': source, 'variant': variant,
                     'selection': 'source_val', 'target_adaptation': False}
     return config, folds[0]
@@ -96,7 +96,7 @@ def evaluate_targets(checkpoint_path, config, protocol, args, device, output):
             loader = build_loader(target['root'], target.get('image_dir', 'Image'), [label],
                                   config['train']['batch_size'], train=False,
                                   num_workers=config['train'].get('num_workers', 6),
-                                  limit=args.limit, image_size=224, resize=True)
+                                  limit=args.limit, image_size=224, resize=False)
             dataset = getattr(loader.dataset, 'dataset', loader.dataset)
             paths = [record[0] for record in dataset.records]
             if len(set(paths)) != len(paths) or seen_paths.intersection(paths):

@@ -47,7 +47,8 @@ class CrossCLITest(unittest.TestCase):
             (data / 'Image').mkdir()
             header = 'Face 2DGaze LeftEyeBox RightEyeBox LeftEyeValid RightEyeValid\n'
             for split in ('train', 'val', 'test', 'm', 'd'):
-                Image.new('RGB', (448, 448)).save(data / 'Image' / f'{split}.png')
+                side = 448 if SAT else 224
+                Image.new('RGB', (side, side)).save(data / 'Image' / f'{split}.png')
                 (data / 'Label' / f'{split}.label').write_text(
                     header + f'{split}.png 0.2,0.1 -1,-1,-1,-1 -1,-1,-1,-1 0 0\n')
             cfg = dict(dataset='ETH-XGaze', data=dict(root=str(data), image_size=448,
